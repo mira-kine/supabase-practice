@@ -29,18 +29,24 @@ export async function getMovieByTitle(title) {
 
 export async function getOldestMovie() {
   // return the oldest movie (assume the database is not sorted)
-  const resp = await client.from('movies').select('title').eq('year', '1977').single();
-  return checkError(resp);
+  const { data, error } = await client.from('movies').select('*').order('year').limit(1).single();
+  return data;
 }
 
 export async function getMoviesAfter(year) {
   // return movies made after the year passed in
-  const resp = await client.from('movies').select('title').gte('year', `${year}`);
+  const resp = await client.from('movies').select('*').gt('year', year);
   return checkError(resp);
 }
 
 export async function getHighestGrossingMovie() {
   // return movie with the highest box office total
-  const resp = await client.from('movies').select('*').eq('box_office', '2069').single();
-  return checkError(resp);
+  // const resp = await client.from('movies').select('*').eq('box_office', '2069').single();
+  const { data, error } = await client
+    .from('movies')
+    .select('*')
+    .order('box_office', { ascending: false })
+    .limit(1)
+    .single();
+  return data;
 }
